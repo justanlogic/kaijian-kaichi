@@ -88,7 +88,7 @@ Naming rules, deduplication, and sources are documented in [docs/food-data.md](d
 
 ## Roadmap
 
-- **v1.7.1**: demo mode, search-selection fix, docs
+- **v1.7.1 (released)**: demo mode, search-selection fix, docs
 - **v1.8.0**: weekly report, CSV export, shareable summary card
 - **v1.9.0**: Strong / Hevy CSV import, per-account local cache isolation
 - **v2.0.0**: English UI, Hong Kong food pack, PWA Share Target
