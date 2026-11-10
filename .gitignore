@@ -1,0 +1,16 @@
+# WorkBuddy 本机运行目录（含记忆、截图、依赖缓存）
+.workbuddy/
+
+# 应用托管元数据
+*.genie
+
+# 本地汇报材料（不随仓库发布）
+产品迭代复盘_开健开吃/
+
+# 依赖与系统文件
+node_modules/
+.DS_Store
+Thumbs.db
+
+# 本地日志
+*.log

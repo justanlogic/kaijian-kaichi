@@ -1,0 +1,21 @@
+{
+  "id": "kaijian-kaichi",
+  "name": "开健开吃 · 训练与营养记录",
+  "short_name": "开健开吃",
+  "description": "记录每天的训练动作、组数、重量与次数，也记录饮食热量与三大营养素，并与每日目标对比。支持离线使用，数据保存在本机。",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "background_color": "#080d0b",
+  "theme_color": "#080d0b",
+  "orientation": "any",
+  "categories": ["health", "fitness", "lifestyle", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
