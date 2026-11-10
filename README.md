@@ -70,6 +70,10 @@
 
 ## 界面
 
+![30 秒演示](docs/assets/demo.gif)
+
+<sub>30 秒演示：概览 → 搜「麦当劳」→ 巨无霸 215g / 550 kcal → 保存 → 查看目标</sub>
+
 <p align="center">
   <img src="docs/assets/food-search.png" width="46%" alt="搜索麦当劳，一键记录巨无霸" />
   <img src="docs/assets/targets.png" width="46%" alt="按身体数据推荐每日营养目标" />

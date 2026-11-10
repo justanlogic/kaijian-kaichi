@@ -38,6 +38,10 @@ Kaijian Kaichi combines a gym log and a food diary in one local-first PWA. It sh
 
 ## Screenshots
 
+![30-second demo](docs/assets/demo.gif)
+
+<sub>30-second demo: overview → search “麦当劳” → Big Mac 215g / 550 kcal → save → targets.</sub>
+
 <p align="center">
   <img src="docs/assets/food-search.png" width="46%" alt="Search McDonald's and log a Big Mac" />
   <img src="docs/assets/targets.png" width="46%" alt="Personalized calorie and macro targets" />
