@@ -1,12 +1,13 @@
 /* 开健开吃 · Service Worker（离线缓存） */
 
-const VERSION = 'kjkc-v1.7.0';
+const VERSION = 'kjkc-v1.7.1';
 
 const ASSETS = [
   './',
   './index.html',
   './assets/styles.css',
   './js/app.js',
+  './js/demo.js',
   './js/store.js',
   './js/util.js',
   './js/data.js',

@@ -1806,3 +1806,59 @@ dialog.sheet.wide { width: min(700px, calc(100vw - 32px)); }
   }
   html { scroll-behavior: auto; }
 }
+
+/* ============================================================
+   演示模式（?demo=1）
+   ============================================================ */
+.demo-mode #cloud-card {
+  display: none;
+}
+
+.demo-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(92vw, 520px);
+  padding: 10px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 18px 40px -22px rgba(0, 0, 0, .65);
+}
+
+.demo-banner b {
+  color: var(--lime-text);
+}
+
+.demo-banner .demo-exit {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--lime-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.demo-banner .demo-exit:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .demo-banner {
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+    gap: 10px;
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+}

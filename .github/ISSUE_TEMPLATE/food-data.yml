@@ -1,0 +1,72 @@
+name: 食物数据
+description: 新增食物、纠正营养值或补充别名
+title: "[Food]: "
+labels: ["food-data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请先读 [食物库规范](https://github.com/justanlogic/kaijian-kaichi/blob/main/docs/food-data.md)，并跑一遍 `node scripts/check-foods.mjs`。
+  - type: input
+    id: name
+    attributes:
+      label: 食物名称
+      description: 按「主体名 + 必要状态」写，品牌放别名
+      placeholder: 例如：叉烧 / 麦当劳巨无霸
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: 分类
+      options:
+        - 主食
+        - 肉蛋
+        - 水产
+        - 豆制品
+        - 乳品
+        - 蔬菜
+        - 水果
+        - 坚果油脂
+        - 快餐
+        - 烧腊
+        - 饮品
+        - 零食其他
+    validations:
+      required: true
+  - type: input
+    id: values
+    attributes:
+      label: 每 100g 数值
+      description: 热量 kcal / 蛋白质 g / 碳水 g / 脂肪 g
+      placeholder: 278 / 23.8 / 7.9 / 16.9
+    validations:
+      required: true
+  - type: input
+    id: amount
+    attributes:
+      label: 默认一份克数
+      placeholder: 100
+  - type: input
+    id: alias
+    attributes:
+      label: 别名（可选）
+      description: 英文逗号分隔；同物异名只加别名，不新建条目
+      placeholder: 麦当劳叉烧,蜜汁叉烧
+  - type: textarea
+    id: source
+    attributes:
+      label: 数据来源
+      description: 成分表条目 / 品牌营养表链接 / 参照数据与校正方式
+      placeholder: 中国食物成分表（第 6 版）第 X 页；或品牌官网链接
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我跑过 `node scripts/check-foods.mjs`，没有重复或分类错误
+          required: true
+        - label: 我确认这不是已有食物的别名，而是确实缺失的条目
+          required: true

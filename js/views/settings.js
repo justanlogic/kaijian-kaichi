@@ -259,7 +259,7 @@ export function render(state, ctx) {
           <span class="net" data-net><i></i><span>在线</span></span>
         </div>
         <div class="setting-row">
-          <div class="sr-main"><strong>版本</strong><span>开健开吃 v1.7.0 · PWA · 离线缓存已启用</span></div>
+          <div class="sr-main"><strong>版本</strong><span>开健开吃 v1.7.1 · PWA · 离线缓存已启用</span></div>
           <button class="btn ghost small" type="button" data-act="refresh-sw">${icon('refresh')}检查更新</button>
         </div>
       </article>

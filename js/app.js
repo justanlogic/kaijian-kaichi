@@ -1,5 +1,7 @@
 /* 开健开吃 · 应用主逻辑 */
 
+// 演示模式必须在 store 之前执行：它会先写入示例数据，再交给 load() 读取
+import './demo.js';
 import { load, actions, subscribe, normalizeState } from './store.js';
 import { todayStr, shiftDate, dateLabel, esc, fmt, clamp, round } from './util.js';
 import { MEALS, FOODS, CATS, EXERCISES, DEFAULT_GOALS } from './data.js';
@@ -481,8 +483,8 @@ function foodListHTML(filter = '') {
 
 function previewHTML() {
   if (!picker || picker.mode !== 'library') return '';
-  const food = allFoods().find((f) => f.id === picker.foodId) || FOODS[0];
-  if (!food) return '<span>先选择一个食物</span>';
+  const food = allFoods().find((f) => f.id === picker.foodId);
+  if (!food) return '<span class="muted">没有匹配的食物，可换个关键词或手动输入</span>';
   const m = computeFood(food, picker.amount);
   return `<span class="pk">≈ ${fmt(m.kcal)} kcal</span>
     <span>蛋白 <b>${fmt(m.protein, 1)}</b> g</span>
@@ -679,6 +681,24 @@ function syncFoodSelection() {
   if (preview) preview.innerHTML = previewHTML();
 }
 
+/* 搜索结果或分类变化后，保证“当前选中项”仍然可见：
+   如果不在结果里，就自动选中第一条；没有结果则清空选择，避免保存到上一次的食物。 */
+function ensurePickerVisible() {
+  if (!picker || picker.mode !== 'library' || !dlg) return;
+  const items = [...dlg.querySelectorAll('#food-list .food-item')];
+  if (!items.length) {
+    picker.foodId = '';
+    syncFoodSelection();
+    return;
+  }
+  if (items.some((el) => el.dataset.id === picker.foodId)) return;
+  const first = allFoods().find((f) => f.id === items[0].dataset.id);
+  if (!first) return;
+  picker.foodId = first.id;
+  picker.amount = first.amount || 100;
+  syncFoodSelection();
+}
+
 function switchMealMode(mode) {
   if (!picker) return;
   picker.mode = mode === 'manual' ? 'manual' : 'library';
@@ -694,10 +714,10 @@ function saveMeal(form) {
   let payload = null;
 
   if (picker && picker.mode === 'library') {
-    const food = allFoods().find((f) => f.id === picker.foodId) || FOODS[0];
+    const food = allFoods().find((f) => f.id === picker.foodId);
     const amount = Number(data.get('amount'));
     if (!food) {
-      toast('请选择一个食物');
+      toast('请先选择一个食物');
       return;
     }
     if (!Number.isFinite(amount) || amount <= 0 || amount > 2000) {
@@ -1716,6 +1736,7 @@ document.addEventListener('click', (event) => {
       if (list) {
         const input = dlg.querySelector('#food-search');
         list.innerHTML = foodListHTML(input ? input.value : '');
+        ensurePickerVisible();
       }
       break;
     }
@@ -1818,6 +1839,7 @@ document.addEventListener('input', (event) => {
     if (chips) chips.innerHTML = foodCatChips();
     const list = dlg.querySelector('#food-list');
     if (list) list.innerHTML = foodListHTML(el.value);
+    ensurePickerVisible();
   }
   if (el.id === 'food-amount' && picker) {
     const value = Number(el.value);

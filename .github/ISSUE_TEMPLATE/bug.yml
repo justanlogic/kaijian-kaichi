@@ -1,0 +1,57 @@
+name: Bug 报告
+description: 记录、计算、同步或界面出现异常
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请勿粘贴真实体重、体脂、饮食记录或账号信息。需要截图时，请用 `?demo=1` 的示例数据。
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 一句话描述问题
+      placeholder: 例如：搜索「麦当劳」后直接保存，记录成了米饭
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开营养页
+        2. 点记录饮食
+        3. 搜索「麦当劳」
+        4. 直接点保存
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 你期望的结果
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: 环境
+      description: 浏览器 / 系统 / 设备
+      placeholder: Chrome 131 / Windows 11 / 桌面
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: 控制台报错（可选）
+      description: 打开开发者工具 → Console，粘贴相关报错
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已确认用的是最新代码（或线上 Demo）
+          required: true
+        - label: 我没有在内容中粘贴真实健康数据或账号信息
+          required: true

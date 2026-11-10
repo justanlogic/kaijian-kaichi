@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 先看贡献指南
+    url: https://github.com/justanlogic/kaijian-kaichi/blob/main/CONTRIBUTING.md
+    about: 本地运行、食物数据规范、代码约定与提交前检查
+  - name: 在线试用（示例数据）
+    url: https://justanlogic.github.io/kaijian-kaichi/?demo=1
+    about: 用 70kg / 15% 体脂的示例数据体验，不会覆盖本机记录
