@@ -1813,6 +1813,113 @@ document.addEventListener('click', (event) => {
   }
 });
 
+/* ============================ 图表悬停提示 ============================ */
+
+const chartTip = { col: null };
+
+function chartTipTarget(target) {
+  return target instanceof Element ? target.closest('.bar-col[data-tip]') : null;
+}
+
+function openChartTip(col, clientX, clientY) {
+  const area = col.closest('.chart-area');
+  const tip = area && area.querySelector('.chart-tip');
+  if (!tip) return;
+  let data;
+  try {
+    data = JSON.parse(col.dataset.tip);
+  } catch (err) {
+    return;
+  }
+  const aria = data.items.map((i) => `${i.label} ${i.pct}%`).join('，');
+  tip.innerHTML = `<div class="ct-head"><b>${esc(data.title)}</b><span>${fmt(data.kcal)} kcal</span></div>
+    <div class="ct-bar" role="img" aria-label="${esc(aria)}">
+      ${data.items.map((i) => `<i style="width:${i.pct}%;background:${i.color}"></i>`).join('')}
+    </div>
+    <ul>${data.items
+      .map(
+        (i) =>
+          `<li><i style="background:${i.color}"></i><span>${esc(i.label)}</span><b>${i.pct}%</b><em>${fmt(i.grams)} g</em></li>`
+      )
+      .join('')}</ul>`;
+  tip.hidden = false;
+  chartTip.col = col;
+  col.classList.add('is-hover');
+  placeChartTip(col, tip, area, clientX, clientY);
+}
+
+function placeChartTip(col, tip, area, clientX, clientY) {
+  const ar = area.getBoundingClientRect();
+  const tw = tip.offsetWidth;
+  const th = tip.offsetHeight;
+  let x;
+  let y;
+  if (clientX == null) {
+    const cr = col.getBoundingClientRect();
+    x = cr.left - ar.left + cr.width / 2 - tw / 2;
+    y = cr.top - ar.top - th - 10;
+    if (y < 4) y = 4;
+  } else {
+    x = clientX - ar.left + 16;
+    y = clientY - ar.top + 16;
+    if (x + tw > ar.width - 4) x = clientX - ar.left - tw - 16;
+    if (y + th > ar.height - 4) y = clientY - ar.top - th - 16;
+  }
+  x = Math.max(4, Math.min(x, ar.width - tw - 4));
+  y = Math.max(4, Math.min(y, ar.height - th - 4));
+  tip.style.left = `${x}px`;
+  tip.style.top = `${y}px`;
+}
+
+function closeChartTip(col) {
+  const target = col || chartTip.col;
+  if (!target) return;
+  const area = target.closest('.chart-area');
+  const tip = area && area.querySelector('.chart-tip');
+  if (tip) {
+    tip.hidden = true;
+    tip.innerHTML = '';
+  }
+  target.classList.remove('is-hover');
+  if (chartTip.col === target) chartTip.col = null;
+}
+
+document.addEventListener('pointerover', (event) => {
+  if (event.pointerType === 'touch') return;
+  const col = chartTipTarget(event.target);
+  if (!col || col === chartTip.col) return;
+  openChartTip(col, event.clientX, event.clientY);
+});
+
+document.addEventListener('pointermove', (event) => {
+  if (event.pointerType === 'touch') return;
+  const col = chartTip.col;
+  if (!col || !col.contains(event.target)) return;
+  const area = col.closest('.chart-area');
+  const tip = area && area.querySelector('.chart-tip');
+  if (tip && !tip.hidden) placeChartTip(col, tip, area, event.clientX, event.clientY);
+});
+
+document.addEventListener('pointerout', (event) => {
+  if (event.pointerType === 'touch') return;
+  const col = chartTipTarget(event.target);
+  if (!col || col !== chartTip.col) return;
+  if (event.relatedTarget && col.contains(event.relatedTarget)) return;
+  closeChartTip(col);
+});
+
+document.addEventListener('pointerdown', (event) => {
+  if (event.pointerType === 'mouse') return;
+  const col = chartTipTarget(event.target);
+  const same = col && col === chartTip.col;
+  closeChartTip();
+  if (col && !same) openChartTip(col, null, null);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeChartTip();
+});
+
 document.addEventListener('input', (event) => {
   const el = event.target;
   if (el.name === 'confirm' && el.closest && el.closest('#clear-form')) {

@@ -26,6 +26,32 @@ export function emptyTotals() {
   return { kcal: 0, protein: 0, carbs: 0, fat: 0 };
 }
 
+const MACRO_META = [
+  { key: 'protein', label: '蛋白质', kcalPerGram: 4 },
+  { key: 'carbs', label: '碳水', kcalPerGram: 4 },
+  { key: 'fat', label: '脂肪', kcalPerGram: 9 },
+];
+
+/**
+ * 三大营养素供能占比：按 4 / 4 / 9 kcal/g 折算能量后取百分比。
+ * 四舍五入的误差补到占比最大的一项，保证三项合计 100%。
+ */
+export function macroShares(totals) {
+  const energy = MACRO_META.map((m) => (Number(totals[m.key]) || 0) * m.kcalPerGram);
+  const sumEnergy = energy.reduce((a, b) => a + b, 0);
+  if (!sumEnergy) return [];
+  const raw = energy.map((e) => (e / sumEnergy) * 100);
+  const pct = raw.map((v) => Math.round(v));
+  const gap = 100 - pct.reduce((a, b) => a + b, 0);
+  if (gap !== 0) pct[raw.indexOf(Math.max(...raw))] += gap;
+  return MACRO_META.map((m, i) => ({
+    key: m.key,
+    label: m.label,
+    pct: pct[i],
+    grams: Number(totals[m.key]) || 0,
+  }));
+}
+
 export function nutritionOn(state, date) {
   const meals = mealsOn(state, date);
   const totals = emptyTotals();

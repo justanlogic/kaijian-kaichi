@@ -1,7 +1,7 @@
 /* 概览页 */
 
 import { esc, fmt, fullDateLabel, lastNDates, weekdayShort, sum, dateLabel } from '../util.js';
-import { nutritionOn, workoutsOn, workoutVolume, workoutSetCount, streak, trainingInRange } from '../selectors.js';
+import { nutritionOn, workoutsOn, workoutVolume, workoutSetCount, streak, trainingInRange, macroShares } from '../selectors.js';
 import { ring, macroBar, weekChart, emptyState } from '../components.js';
 import { MEALS } from '../data.js';
 import { icon } from '../icons.js';
@@ -84,17 +84,19 @@ export function render(state, ctx) {
   const days = streak(state, today);
   const weekDates = lastNDates(7, today);
   const week = trainingInRange(state, weekDates);
-  const weekKcal = weekDates.map((d) => nutritionOn(state, d).totals.kcal);
+  const weekDays = weekDates.map((d) => nutritionOn(state, d));
+  const weekKcal = weekDays.map((x) => x.totals.kcal);
   const loggedDays = weekKcal.filter((v) => v > 0);
   const avg = loggedDays.length ? Math.round(sum(loggedDays) / loggedDays.length) : 0;
   const remaining = goals.kcal - totals.kcal;
   const over = remaining < 0;
 
-  const chartItems = weekDates.map((d) => ({
+  const chartItems = weekDates.map((d, i) => ({
     short: d === today ? '今天' : weekdayShort(d).slice(1),
-    value: nutritionOn(state, d).totals.kcal,
+    value: weekDays[i].totals.kcal,
     today: d === today,
     unit: ' kcal',
+    macro: macroShares(weekDays[i].totals),
   }));
 
   return `
@@ -161,7 +163,7 @@ export function render(state, ctx) {
       <div class="card-head">
         <div>
           <h2>近 7 天热量</h2>
-          <p class="muted">与每日目标 ${fmt(goals.kcal)} kcal 对比</p>
+          <p class="muted">与每日目标 ${fmt(goals.kcal)} kcal 对比<span class="hide-sm"> · 悬停柱子看营养占比</span><span class="show-sm"> · 点柱子看营养占比</span></p>
         </div>
         <span class="chip-static">${icon('flame')}${loggedDays.length ? `日均 ${fmt(avg)} kcal` : '暂无记录'}</span>
       </div>
