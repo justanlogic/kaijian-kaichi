@@ -47,6 +47,19 @@ const VIEWS = {
   settings: renderSettings,
 };
 
+const RELOAD_VIEW_KEY = 'kjkc.reload-view';
+
+// 检查更新会整页刷新；刷新后回到原来的页面，避免落回概览
+try {
+  const savedView = sessionStorage.getItem(RELOAD_VIEW_KEY);
+  if (savedView && VIEWS[savedView]) {
+    ctx.view = savedView;
+    sessionStorage.removeItem(RELOAD_VIEW_KEY);
+  }
+} catch (err) {
+  /* 隐私模式下无法读取，保持默认页面 */
+}
+
 const main = document.getElementById('main');
 const dlg = document.getElementById('dlg');
 const toaster = document.getElementById('toaster');
@@ -1480,9 +1493,30 @@ async function registerServiceWorker() {
   }
 }
 
+function waitForWorker(worker) {
+  return new Promise((resolve) => {
+    if (!worker || worker.state === 'activated' || worker.state === 'redundant') {
+      resolve();
+      return;
+    }
+    const finish = () => {
+      if (worker.state === 'activated' || worker.state === 'redundant') {
+        worker.removeEventListener('statechange', finish);
+        resolve();
+      }
+    };
+    worker.addEventListener('statechange', finish);
+    setTimeout(resolve, 2500);
+  });
+}
+
 async function refreshCache() {
   if (!('serviceWorker' in navigator)) {
     toast('当前环境不支持离线缓存');
+    return;
+  }
+  if (!navigator.onLine) {
+    toast('当前离线，连上网络后再检查更新');
     return;
   }
   try {
@@ -1491,17 +1525,20 @@ async function refreshCache() {
       toast('离线缓存尚未就绪，请稍后再试');
       return;
     }
+    const before = reg.installing || reg.waiting;
     await reg.update();
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    if (reg.waiting || reg.installing) {
-      updateNotified = false;
-      notifyUpdate();
-    } else {
-      toast('已是最新版本');
+    const pending = reg.installing || reg.waiting || before;
+    toast(pending ? '发现新版本，正在更新…' : '已是最新版本，正在刷新…');
+    if (pending) await waitForWorker(pending);
+    try {
+      sessionStorage.setItem(RELOAD_VIEW_KEY, ctx.view);
+    } catch (err) {
+      /* 隐私模式下忽略 */
     }
+    window.location.reload();
   } catch (err) {
     console.warn(err);
-    toast('检查更新失败');
+    toast('检查更新失败，请稍后重试');
   }
 }
 

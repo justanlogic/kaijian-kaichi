@@ -5,6 +5,9 @@ import { viewHead } from '../components.js';
 import { icon } from '../icons.js';
 import { goalLabel } from '../recommend.js';
 
+/** 当前实际运行的前端版本；发版时与 sw.js 的缓存版本一起更新 */
+const APP_VERSION = 'v1.7.3';
+
 
 function formatSyncTime(iso) {
   if (!iso) return '尚未同步';
@@ -259,8 +262,11 @@ export function render(state, ctx) {
           <span class="net" data-net><i></i><span>在线</span></span>
         </div>
         <div class="setting-row">
-          <div class="sr-main"><strong>版本</strong><span>开健开吃 v1.7.2 · PWA · 离线缓存已启用</span></div>
-          <button class="btn ghost small" type="button" data-act="refresh-sw">${icon('refresh')}检查更新</button>
+          <div class="sr-main"><strong>版本</strong><span>PWA · 离线缓存已启用</span></div>
+          <div class="sr-actions">
+            <span class="ver-now" title="当前页面实际运行的版本">当前运行 <b>${APP_VERSION}</b></span>
+            <button class="btn ghost small" type="button" data-act="refresh-sw">${icon('refresh')}检查更新</button>
+          </div>
         </div>
       </article>
 

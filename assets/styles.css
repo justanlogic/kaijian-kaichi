@@ -1140,6 +1140,19 @@ input[type="number"] { -moz-appearance: textfield; }
 .setting-row .sr-main span { font-size: 11px; color: var(--text-3); }
 .setting-row .seg { width: 260px; flex: none; }
 .card > .seg { max-width: 340px; }
+.sr-actions { display: flex; align-items: center; gap: 10px; flex: none; margin-left: auto; }
+.ver-now {
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: 10.5px;
+  line-height: 1.5;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.ver-now b { color: var(--text-2); font-weight: 600; }
 
 .data-stats { display: flex; flex-wrap: wrap; gap: 34px; margin-bottom: 4px; }
 .data-stats div { display: flex; flex-direction: column; flex: none; white-space: nowrap; }
