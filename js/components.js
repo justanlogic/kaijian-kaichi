@@ -71,8 +71,8 @@ export function weekChart({ items, goal = 0, labelEvery = 1, empty = '还没有�
               ? `${it.short} ${fmt(value)} kcal，${it.macro.map((m) => `${m.label} ${m.pct}%`).join('，')}`
               : plain;
             return `<div class="bar-col${it.today ? ' is-today' : ''}" style="--h:${height.toFixed(2)}%"${
-              tip ? ` data-tip="${tip}"` : ''
-            } title="${esc(plain)}" aria-label="${esc(label)}">
+              tip ? ` data-tip="${tip}"` : ` title="${esc(plain)}"`
+            } aria-label="${esc(label)}">
               <div class="bar-wrap">
                 ${value > 0 && !dense ? `<span class="bar-val">${fmt(value)}</span>` : ''}${value > 0 ? '<div class="bar-fill"></div>' : ''}
               </div>
