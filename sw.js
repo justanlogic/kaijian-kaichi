@@ -1,6 +1,6 @@
 /* 开健开吃 · Service Worker（离线缓存） */
 
-const VERSION = 'kjkc-v1.7.1';
+const VERSION = 'kjkc-v1.7.2';
 
 const ASSETS = [
   './',

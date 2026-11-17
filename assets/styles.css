@@ -345,6 +345,7 @@ svg { display: block; }
 
 .muted { font-size: 12px; color: var(--text-2); }
 .tiny { font-size: 11px; color: var(--text-3); }
+.hide-sm { display: inline; }
 .num { font-variant-numeric: tabular-nums; }
 
 .stack { display: flex; flex-direction: column; gap: 16px; }
@@ -662,11 +663,98 @@ svg { display: block; }
 .chart-x { display: flex; gap: clamp(8px, 2vw, 22px); }
 .chart-x span {
   flex: 1;
+  min-width: 0;
   text-align: center;
   font-size: 10.5px;
   color: var(--text-3);
 }
 .chart-x span.is-today { color: var(--lime-text); font-weight: 600; }
+
+/* 30 天等密集视图：压缩间距与刻度字号，避免窄屏横向溢出 */
+.chart.is-dense .chart-area .bars,
+.chart.is-dense .chart-x { gap: 3px; }
+.chart.is-dense .chart-x span { font-size: 9px; letter-spacing: -.02em; }
+.chart.is-dense .chart-x span:first-child { text-align: left; }
+.chart.is-dense .chart-x span:last-child { text-align: right; }
+
+/* 柱内堆叠：柱高仍是当日总热量，分段按蛋白质 / 碳水 / 脂肪供能占比 */
+.bar-fill.bar-stack {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  overflow: hidden;
+  background: none;
+  border: 0;
+}
+.bar-seg {
+  display: block;
+  width: 100%;
+  min-height: 2px;
+  flex: none;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 44%, rgba(0, 0, 0, .18));
+}
+[data-theme="light"] .bar-seg {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 46%, rgba(0, 0, 0, .08));
+}
+.bar-col.is-today .bar-fill.bar-stack {
+  background: none;
+  box-shadow: 0 0 0 1px rgba(180, 239, 74, .5), 0 8px 18px -14px rgba(180, 239, 74, .85);
+}
+[data-theme="light"] .bar-col.is-today .bar-fill.bar-stack {
+  box-shadow: 0 0 0 1px rgba(110, 168, 30, .5), 0 8px 18px -16px rgba(110, 168, 30, .5);
+}
+
+/* 供能占比：100% 条 + 图例 */
+.macro-split { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.ms-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin-bottom: 9px;
+}
+.ms-title { font-size: 12.5px; font-weight: 600; color: var(--text); }
+.ms-note { font-size: 11px; color: var(--text-3); }
+.ms-bar {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: var(--ring-track);
+}
+.ms-bar i { display: block; height: 100%; }
+.ms-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 11px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ms-legend li { display: flex; align-items: baseline; gap: 6px; font-size: 11.5px; }
+.ms-legend i { width: 7px; height: 7px; border-radius: 2px; align-self: center; flex: none; }
+.ms-name { color: var(--text-2); }
+.ms-legend b {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.ms-legend em {
+  font-style: normal;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.ms-legend em::before { content: '·'; margin-right: 5px; color: var(--text-3); }
+
+@media (max-width: 720px) {
+  .hide-sm { display: none; }
+  .ms-bar { height: 8px; }
+  .ms-legend { gap: 7px 14px; }
+  .ms-legend em { font-size: 11px; }
+}
 
 /* ============================ 日期条 ============================ */
 
@@ -1037,6 +1125,7 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 .food-cats .chip { flex: none; }
 .food-cats .chip-group { display: flex; gap: 6px; flex: none; }
+.chip-group { display: flex; flex: none; align-items: center; gap: 6px; }
 .chip.is-active { font-weight: 650; }
 .chip {
   padding: 5px 10px;

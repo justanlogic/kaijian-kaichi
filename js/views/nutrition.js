@@ -2,9 +2,43 @@
 
 import { esc, fmt, fullDateLabel, lastNDates, weekdayShort, sum, clamp, shiftDate } from '../util.js';
 import { nutritionOn } from '../selectors.js';
-import { dateBar, viewHead, ring, macroBar, weekChart } from '../components.js';
+import { dateBar, viewHead, ring, macroBar, weekChart, macroSplit } from '../components.js';
 import { MEALS } from '../data.js';
 import { icon } from '../icons.js';
+
+const MACRO_COLORS = { protein: 'var(--blue)', carbs: 'var(--orange)', fat: 'var(--pink)' };
+const MACRO_NAMES = { protein: '蛋白质', carbs: '碳水', fat: '脂肪' };
+
+/** 四舍五入后把误差补到占比最大的一项，保证三项相加正好 100% */
+function percentLabels(values) {
+  const total = values.reduce((a, b) => a + b, 0);
+  if (!total) return values.map(() => 0);
+  const raw = values.map((v) => (v / total) * 100);
+  const pct = raw.map((v) => Math.round(v));
+  const gap = 100 - pct.reduce((a, b) => a + b, 0);
+  if (gap !== 0) pct[raw.indexOf(Math.max(...raw))] += gap;
+  return pct;
+}
+
+/** 把一天的热量按三大营养素供能比例拆成柱状分段；能量缺失时返回 null */
+function macroParts(totals) {
+  const energy = {
+    protein: (Number(totals.protein) || 0) * 4,
+    carbs: (Number(totals.carbs) || 0) * 4,
+    fat: (Number(totals.fat) || 0) * 9,
+  };
+  const keys = ['protein', 'carbs', 'fat'];
+  const values = keys.map((k) => energy[k]);
+  const sumEnergy = values.reduce((a, b) => a + b, 0);
+  const kcal = Number(totals.kcal) || 0;
+  if (!sumEnergy || !kcal) return null;
+  const pct = percentLabels(values);
+  return keys.map((key, i) => ({
+    value: (kcal * values[i]) / sumEnergy,
+    color: MACRO_COLORS[key],
+    label: `${MACRO_NAMES[key]} ${pct[i]}%`,
+  }));
+}
 
 function portionLabel(meal) {
   if (Number(meal.amount) > 0) return `${fmt(meal.amount)} g`;
@@ -32,15 +66,33 @@ export function render(state, ctx) {
   const over = remaining < 0;
   const range = Number(ctx.nutritionRange) === 30 ? 30 : 7;
   const weekDates = lastNDates(range, date);
-  const weekKcal = weekDates.map((d) => nutritionOn(state, d).totals.kcal);
+  const weekDays = weekDates.map((d) => nutritionOn(state, d));
+  const weekKcal = weekDays.map((x) => x.totals.kcal);
   const logged = weekKcal.filter((v) => v > 0);
   const avg = logged.length ? Math.round(sum(logged) / logged.length) : 0;
-  const chartItems = weekDates.map((d) => ({
-    short: range === 7 ? (d === today ? '今天' : weekdayShort(d).slice(1)) : d.slice(5).replace('-', '/'),
-    value: nutritionOn(state, d).totals.kcal,
-    today: d === date,
-    unit: ' kcal',
-  }));
+  const macroGrams = weekDays.reduce(
+    (acc, x) => {
+      acc.protein += x.totals.protein;
+      acc.carbs += x.totals.carbs;
+      acc.fat += x.totals.fat;
+      return acc;
+    },
+    { protein: 0, carbs: 0, fat: 0 }
+  );
+  const chartItems = weekDates.map((d, i) => {
+    const totals = weekDays[i].totals;
+    const short = range === 7 ? (d === today ? '今天' : weekdayShort(d).slice(1)) : d.slice(5).replace('-', '/');
+    const parts = macroParts(totals);
+    const share = parts ? parts.map((p) => p.label).join(' / ') : '';
+    return {
+      short,
+      value: totals.kcal,
+      today: d === date,
+      unit: ' kcal',
+      parts: parts || undefined,
+      tip: totals.kcal ? `${short} ${fmt(totals.kcal)} kcal${share ? ` · ${share}` : ''}` : `${short} 未记录`,
+    };
+  });
   const summary = `<b>${meals.length}</b> 条记录 · 蛋白质 ${fmt(totals.protein, 1)}g · 碳水 ${fmt(totals.carbs, 1)}g`;
 
   const yesterday = shiftDate(date, -1);
@@ -85,7 +137,7 @@ export function render(state, ctx) {
       <div class="card-head">
         <div>
           <h2>近 ${range} 天热量</h2>
-          <p class="muted">虚线为每日目标 ${fmt(goals.kcal)} kcal${logged.length ? ` · 日均 ${fmt(avg)} kcal` : ''}</p>
+          <p class="muted">虚线为每日目标 ${fmt(goals.kcal)} kcal${logged.length ? ` · 日均 ${fmt(avg)} kcal` : ''}<span class="hide-sm"> · 柱内为供能占比</span></p>
         </div>
         <div class="chip-group" role="group" aria-label="趋势区间">
           <button class="chip${range === 7 ? ' is-active' : ''}" type="button" data-act="nutrition-range" data-range="7">7 天</button>
@@ -93,6 +145,15 @@ export function render(state, ctx) {
         </div>
       </div>
       ${weekChart({ items: chartItems, goal: goals.kcal, labelEvery: range === 30 ? 5 : 1 })}
+      ${
+        logged.length
+          ? macroSplit({
+              grams: macroGrams,
+              days: logged.length,
+              note: `近 ${range} 天已记录 ${logged.length} 天`,
+            })
+          : ''
+      }
     </article>
 
     <div class="stack">

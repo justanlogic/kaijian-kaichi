@@ -31,7 +31,7 @@ Kaijian Kaichi combines a gym log and a food diary in one local-first PWA. It sh
 ## Features
 
 - **Training**: exercises, sets, weight, reps, date, notes; volume and PR detection; history by day; copy last workout; reusable templates; undo delete.
-- **Nutrition**: 230 foods with kcal / protein / carbs / fat per 100g; meal groups; portion math; edit entries; copy yesterday; recent foods; custom foods; 7/30-day trend.
+- **Nutrition**: 230 foods with kcal / protein / carbs / fat per 100g; meal groups; portion math; edit entries; copy yesterday; recent foods; custom foods; 7/30-day trend with macro energy split.
 - **Body metrics**: weight, waist, body fat; 14-point sparkline; latest weight feeds the calorie target.
 - **Targets**: Mifflin-St Jeor BMR + activity factor + MET 6.0 training + goal factor; protein 1.7–2.0 g/kg, fat 0.9 g/kg, carbs by remainder; safety guards (BMI, age, training frequency).
 - **App**: offline via Service Worker, installable PWA, dark/light/system themes, JSON export/import with validation and 10-second undo, optional cloud sync with per-account isolation.
@@ -92,7 +92,8 @@ Naming rules, deduplication, and sources are documented in [docs/food-data.md](d
 
 ## Roadmap
 
-- **v1.7.1 (released)**: demo mode, search-selection fix, docs
+- **v1.7.2 (released)**: trend bars split by protein / carbs / fat energy share, with range-level ratio and daily average
+- **v1.7.1**: demo mode, search-selection fix, docs
 - **v1.8.0**: weekly report, CSV export, shareable summary card
 - **v1.9.0**: Strong / Hevy CSV import, per-account local cache isolation
 - **v2.0.0**: English UI, Hong Kong food pack, PWA Share Target
