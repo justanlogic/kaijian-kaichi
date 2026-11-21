@@ -28,6 +28,7 @@ import {
 import { render as renderOverview } from './views/overview.js';
 import { render as renderFitness } from './views/fitness.js';
 import { render as renderNutrition } from './views/nutrition.js';
+import { render as renderHealth } from './views/health.js';
 import { render as renderSettings, cloudCardInner } from './views/settings.js';
 
 const state = load();
@@ -44,6 +45,7 @@ const VIEWS = {
   overview: renderOverview,
   fitness: renderFitness,
   nutrition: renderNutrition,
+  health: renderHealth,
   settings: renderSettings,
 };
 

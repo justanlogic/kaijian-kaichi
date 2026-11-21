@@ -3,6 +3,7 @@
 const ICONS = {
   gauge: '<path d="M4.6 18.4a8.4 8.4 0 1 1 14.8 0"/><path d="M12 18.2l4.2-5.4"/><circle cx="12" cy="18.2" r="1.1" fill="currentColor" stroke="none"/>',
   dumbbell: '<path d="M6.5 8v8M3.5 10v4M17.5 8v8M20.5 10v4M6.5 12h11"/>',
+  pulse: '<path d="M3 12h4l2.2-5.6L13 18l2.4-6H21"/>',
   apple: '<path d="M12 8.3c-1.3-1.6-3.2-2.1-4.8-1.2C5.4 8.2 4.9 10.9 5.9 13.5c.9 2.4 2.8 4.7 4.6 5.3.9.3 1.9.3 2.8 0 1.9-.6 3.8-2.9 4.6-5.3 1-2.6.5-5.3-1.3-6.4-1.6-.9-3.5-.4-4.6 1.2Z"/><path d="M12 8.3c-.1-2 .7-3.5 2.4-4.5"/>',
   sliders: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',

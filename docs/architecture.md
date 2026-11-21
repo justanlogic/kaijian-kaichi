@@ -26,7 +26,9 @@ flowchart TD
 | `js/store.js` | localStorage 读写、`normalize()` 数据校验、actions、订阅 |
 | `js/selectors.js` | 容量、营养合计、连续记录、PR 判定等派生数据 |
 | `js/recommend.js` | 营养目标公式、输入校验、安全边界 |
-| `js/views/*` | 概览 / 训练 / 营养 / 设置四个页面 |
+| `js/assessment.js` | 当日营养评估：是否吃够、缺口与补充建议 |
+| `js/health.js` | 近 28 天健康趋势：饮食结构、稳定性、训练频率与容量 |
+| `js/views/*` | 概览 / 训练 / 营养 / 评估 / 设置五个页面 |
 | `js/components.js` | 热量环、营养条、柱状图、日期条等片段 |
 | `js/cloud.js` | SDK 初始化、双登录、推送 / 拉取、冲突选择 |
 | `js/demo.js` | `?demo=1` 示例数据、演示提示、避免覆盖真实数据 |
@@ -102,6 +104,6 @@ flowchart TD
 ## 已知限制
 
 - localStorage 约 5MB，长期大量记录建议后续迁移 IndexedDB。
-- 同设备切换多个账号时，本机缓存未按 owner 分桶（已列入 v1.9）。
+- 同设备切换多个账号时，本机缓存未按 owner 分桶（已列入 v1.11）。
 - 可访问性未完全达标：浅色主题部分对比度约 3.06:1，部分图标按钮 30px。
 - 云端删除快照暂无 UI，需要开 Issue 处理。
