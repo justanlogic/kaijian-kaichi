@@ -16,6 +16,7 @@ const ASSETS = [
   './js/selectors.js',
   './js/assessment.js',
   './js/health.js',
+  './js/training-analysis.js',
   './js/recommend.js',
   './js/cloud.js',
   './js/cloud-config.js',

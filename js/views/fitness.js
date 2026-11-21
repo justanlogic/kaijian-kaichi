@@ -2,6 +2,7 @@
 
 import { esc, fmt, fullDateLabel, sum, weekdayShort, shiftDate } from '../util.js';
 import { workoutsOn, workoutVolume, workoutSetCount, prIds } from '../selectors.js';
+import { buildTrainingReport } from '../training-analysis.js';
 import { dateBar, viewHead, emptyState, weekChart } from '../components.js';
 import { icon } from '../icons.js';
 
@@ -76,6 +77,114 @@ function historyBlock(state, selectedDate, limit = 14) {
   </div>`;
 }
 
+
+function trainingAnalysis(state, today) {
+  const r = buildTrainingReport(state, today);
+  const pct = (n) => Math.round(n * 100);
+  const trend = (t) => (t == null ? '—' : `${t > 0 ? '↑' : t < 0 ? '↓' : '→'} ${Math.abs(Math.round(t * 100))}%`);
+
+  if (r.insufficient) {
+    return `<article class="card ta-card">
+      <div class="card-head">
+        <div><h2>训练分析</h2><p class="muted">近 28 天 · 还需要更多记录</p></div>
+        <span class="ta-badge is-muted">数据不足</span>
+      </div>
+      <div class="ta-empty">
+        <span class="ta-empty-icon">${icon('dumbbell', 19)}</span>
+        <div><b>${esc(r.headline)}</b><p>${esc(r.summary)}</p></div>
+      </div>
+      <div class="ta-need">
+        <span>训练天数 <b>${r.sessions}</b>/4</span>
+        <span>活跃周 <b>${r.activeWeeks}</b>/2</span>
+        <span>至少 4 天、跨 2 周</span>
+      </div>
+      <button class="btn primary small" type="button" data-act="open-workout">${icon('plus')}记录训练</button>
+    </article>`;
+  }
+
+  const trendValue = r.mainTrend;
+  const noWeakness = r.weaknesses.length === 1 && r.weaknesses[0] === '暂无明显短板';
+  return `<article class="card ta-card">
+    <div class="card-head">
+      <div>
+        <h2>训练分析</h2>
+        <p class="muted">近 28 天 · 4 个训练周${r.partial ? ' · 样本较少，趋势仅供参考' : ''}</p>
+      </div>
+      <span class="ta-badge is-${r.status.tone}">${esc(r.status.label)}</span>
+    </div>
+    <h3 class="ta-headline">${esc(r.headline)}</h3>
+    <p class="ta-summary">${esc(r.summary)}</p>
+
+    <div class="ta-stats">
+      <div><b>${r.sessions}</b><span>训练天数</span></div>
+      <div><b>${pct(r.completion)}%</b><span>完成率</span></div>
+      <div><b class="${trendValue > 0 ? 'is-up' : trendValue < 0 ? 'is-down' : ''}">${trend(trendValue)}</b><span>${esc(r.trendLabel)}变化</span></div>
+      <div><b>${r.hasWeight ? r.prCount : '—'}</b><span>力量 PR</span></div>
+    </div>
+
+    <div class="ta-progress">
+      <div class="ta-progress-head">
+        <span>4 周目标 ${r.targetTotal} 天${r.targetIsDefault ? '（按每周 3 天参考）' : ''}</span>
+        <span>已完成 ${r.sessions} 天</span>
+      </div>
+      <div class="ta-bar"><i style="width:${Math.min(100, Math.max(0, pct(r.completion)))}%"></i></div>
+    </div>
+
+    <div class="ta-weeks">
+      ${r.weeks
+        .map(
+          (w) => `<div class="ta-week${w.sessions ? '' : ' is-empty'}">
+            <span>${esc(w.label)}<small>${esc(w.range)}</small></span>
+            <b>${w.sessions}<small> 天</small></b>
+            <em>${w.volume ? `${fmt(w.volume)} kg` : w.sessions ? '自重' : '—'}</em>
+          </div>`
+        )
+        .join('')}
+    </div>
+
+    ${
+      r.exercises.length
+        ? `<div class="ta-ex">
+            <h3>动作表现</h3>
+            <ul>
+              ${r.exercises
+                .slice(0, 3)
+                .map(
+                  (e) => `<li>
+                    <span class="ta-ex-name">${esc(e.name)}<small>${e.sessions} 次</small></span>
+                    <span class="ta-ex-meta">${e.maxWeight ? `最高 ${fmt(e.maxWeight, 1)} kg${e.weightGain ? `（+${fmt(e.weightGain, 1)}）` : ''}` : '自重'} · ${e.volume ? '容量' : '组数'} ${trend(e.trend)}</span>
+                  </li>`
+                )
+                .join('')}
+            </ul>
+          </div>`
+        : ''
+    }
+
+    <div class="ta-split">
+      <div class="ta-col">
+        <h3>${icon('check', 13)}做得好</h3>
+        <ul class="ta-list is-good">${r.strengths.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
+      </div>
+      <div class="ta-col">
+        <h3>${icon(noWeakness ? 'check' : 'arrowRight', 13)}${noWeakness ? '没有明显短板' : '可以改进'}</h3>
+        <ul class="ta-list ${noWeakness ? 'is-good' : 'is-warn'}">${
+          noWeakness
+            ? '<li>继续保持当前频率与渐进节奏</li>'
+            : r.weaknesses.map((s) => `<li>${esc(s)}</li>`).join('')
+        }</ul>
+      </div>
+    </div>
+
+    <div class="ta-tips">
+      <h3>下一步建议</h3>
+      <ol>${r.tips.map((t, i) => `<li><span>${i + 1}</span><p>${esc(t)}</p></li>`).join('')}</ol>
+    </div>
+
+    <p class="ta-note">${esc(r.disclaimer)}</p>
+  </article>`;
+}
+
 export function render(state, ctx) {
   const date = ctx.dates.fitness;
   const today = ctx.today;
@@ -124,6 +233,8 @@ export function render(state, ctx) {
             action: `<button class="btn primary small" type="button" data-act="open-workout">${icon('plus')}新增动作</button>`,
           })
     }
+
+    ${trainingAnalysis(state, today)}
 
     ${
       state.workouts.length

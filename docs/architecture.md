@@ -28,6 +28,7 @@ flowchart TD
 | `js/recommend.js` | 营养目标公式、输入校验、安全边界 |
 | `js/assessment.js` | 当日营养评估：是否吃够、缺口与补充建议 |
 | `js/health.js` | 近 28 天健康趋势：饮食结构、稳定性、训练频率与容量 |
+| `js/training-analysis.js` | 近 28 天训练分析：完成率、容量/PR、动作趋势与部位覆盖 |
 | `js/views/*` | 概览 / 训练 / 营养 / 评估 / 设置五个页面 |
 | `js/components.js` | 热量环、营养条、柱状图、日期条等片段 |
 | `js/cloud.js` | SDK 初始化、双登录、推送 / 拉取、冲突选择 |

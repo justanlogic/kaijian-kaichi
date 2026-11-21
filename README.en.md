@@ -32,6 +32,7 @@ Kaijian Kaichi combines a gym log and a food diary in one local-first PWA. It sh
 
 - **Training**: exercises, sets, weight, reps, date, notes; volume and PR detection; history by day; copy last workout; reusable templates; undo delete.
 - **Nutrition**: 230 foods with kcal / protein / carbs / fat per 100g; meal groups; portion math; edit entries; copy yesterday; recent foods; custom foods; 7/30-day trend with a hover tooltip showing each day's macro energy split; a daily verdict on whether you ate enough, with portion-level suggestions.
+- **Training analysis**: a 28-day block on the training page covering completion rate, volume/PR change, exercise-level progress and muscle-group coverage, with next-step suggestions.
 - **Health assessment**: a 28-day trend report covering diet structure, intake stability, training frequency and volume trends, with plain-language risks and up to three actionable suggestions; missing data is listed instead of guessed, and the report is explicitly a trend reference, not a diagnosis.
 - **Body metrics**: weight, waist, body fat; 14-point sparkline; latest weight feeds the calorie target.
 - **Targets**: Mifflin-St Jeor BMR + activity factor + MET 6.0 training + goal factor; protein 1.7–2.0 g/kg, fat 0.9 g/kg, carbs by remainder; safety guards (BMI, age, training frequency).
@@ -97,7 +98,7 @@ Naming rules, deduplication, and sources are documented in [docs/food-data.md](d
 - **v1.7.3**: check-for-updates now waits for the new service worker and reloads automatically; the settings page shows the version actually running
 - **v1.7.2**: hover or tap a calorie bar on the overview / nutrition chart to see that day's protein, carbs and fat energy share
 - **v1.7.1**: demo mode, search-selection fix, docs
-- **v1.9.0**: health assessment across the last 28 days of nutrition and training
+- **v1.9.0**: health assessment and training analysis across the last 28 days of nutrition and training
 - **v1.10.0**: weekly report, CSV export, shareable summary card
 - **v1.11.0**: Strong / Hevy CSV import, per-account local cache isolation
 - **v2.0.0**: English UI, Hong Kong food pack, PWA Share Target
