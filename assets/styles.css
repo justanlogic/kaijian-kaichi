@@ -909,6 +909,53 @@ svg { display: block; }
 .nutri-side .big.over { color: var(--orange-text); }
 .nutri-side p { font-size: 11.5px; color: var(--text-3); }
 
+/* 今日评估：结论 + 可执行建议 */
+.nutri-verdict {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px 20px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+}
+.nv-main { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1; min-width: 240px; }
+.nv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.nv-badge i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.nv-badge.ok { color: var(--lime-text); background: var(--lime-soft); }
+.nv-badge.warn { color: var(--orange-text); background: rgba(255, 157, 92, .12); }
+.nv-badge.over { color: var(--pink); background: rgba(255, 138, 181, .12); }
+.nv-badge.muted { color: var(--text-3); background: var(--surface-2); }
+[data-theme="light"] .nv-badge.warn { background: rgba(242, 138, 61, .12); }
+[data-theme="light"] .nv-badge.over { background: rgba(217, 84, 138, .1); }
+.nv-text { font-size: 12px; line-height: 1.55; color: var(--text-2); }
+.nv-tip {
+  flex: none;
+  max-width: 420px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.nv-tip b { margin-right: 5px; color: var(--lime-text); font-weight: 600; }
+
+@media (max-width: 720px) {
+  .nv-main { min-width: 0; }
+  .nv-tip { max-width: none; width: 100%; }
+}
+
 .meal-card { padding: 0; overflow: hidden; }
 .meal-head {
   display: flex;

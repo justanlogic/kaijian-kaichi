@@ -2,6 +2,7 @@
 
 import { esc, fmt, fullDateLabel, lastNDates, weekdayShort, sum, clamp, shiftDate } from '../util.js';
 import { nutritionOn, macroShares } from '../selectors.js';
+import { assessDay, buildTips } from '../assessment.js';
 import { dateBar, viewHead, ring, macroBar, weekChart } from '../components.js';
 import { MEALS } from '../data.js';
 import { icon } from '../icons.js';
@@ -28,6 +29,8 @@ export function render(state, ctx) {
   const today = ctx.today;
   const goals = state.settings.goals;
   const { meals, totals } = nutritionOn(state, date);
+  const assessment = assessDay(totals, goals);
+  const tips = buildTips(assessment);
   const remaining = goals.kcal - totals.kcal;
   const over = remaining < 0;
   const range = Number(ctx.nutritionRange) === 30 ? 30 : 7;
@@ -83,6 +86,13 @@ export function render(state, ctx) {
           <p>${over ? `超出 ${fmt(Math.abs(remaining) / Math.max(goals.kcal, 1) * 100)}%` : `完成 ${fmt(clamp(totals.kcal / Math.max(goals.kcal, 1), 0, 1) * 100)}%`}</p>
           <button class="link" type="button" data-act="nav" data-view="settings" style="margin-top:5px">调整目标 ${icon('arrowRight', 11)}</button>
         </div>
+      </div>
+      <div class="nutri-verdict">
+        <div class="nv-main">
+          <span class="nv-badge ${assessment.tone}" title="热量 90–110%、蛋白质 ≥90%、脂肪 80–120% 视为吃够"><i></i>${assessment.label}</span>
+          <span class="nv-text">${esc(assessment.summary)}</span>
+        </div>
+        ${tips.length ? `<p class="nv-tip"><b>建议</b>${tips.map((t) => esc(t)).join('；')}</p>` : ''}
       </div>
     </article>
 

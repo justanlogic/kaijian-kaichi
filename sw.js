@@ -1,6 +1,6 @@
 /* 开健开吃 · Service Worker（离线缓存） */
 
-const VERSION = 'kjkc-v1.7.3';
+const VERSION = 'kjkc-v1.8.0';
 
 const ASSETS = [
   './',
@@ -14,6 +14,7 @@ const ASSETS = [
   './js/icons.js',
   './js/components.js',
   './js/selectors.js',
+  './js/assessment.js',
   './js/recommend.js',
   './js/cloud.js',
   './js/cloud-config.js',
