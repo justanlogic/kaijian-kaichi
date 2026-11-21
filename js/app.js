@@ -128,11 +128,38 @@ function toast(message, options = {}) {
 
 /* ============================ 渲染 ============================ */
 
+function errorView(title, text, detail = '') {
+  return `<div class="view">
+    <article class="card">
+      <div class="card-head">
+        <div><h2>${esc(title)}</h2><p class="muted">${esc(text)}</p></div>
+      </div>
+      ${detail ? `<p class="muted" style="margin-bottom:14px">${esc(detail)}</p>` : ''}
+      <button class="btn primary" type="button" data-act="reload-app">刷新重试</button>
+    </article>
+  </div>`;
+}
+
 function render(options = {}) {
   ctx.today = todayStr();
   ctx.cloud = getCloudState();
   ctx.safety = readSafety();
-  main.innerHTML = `<div class="view">${VIEWS[ctx.view](state, ctx)}</div>`;
+  const view = VIEWS[ctx.view];
+  if (!view) {
+    main.innerHTML = errorView('页面没有加载', '当前页面可能还在更新，刷新一次即可。');
+    return;
+  }
+  try {
+    main.innerHTML = `<div class="view">${view(state, ctx)}</div>`;
+  } catch (err) {
+    console.error('[开健开吃] 页面渲染失败', err);
+    main.innerHTML = errorView(
+      '页面渲染失败',
+      '刷新后重试；如果仍然失败，可以在设置页导出数据后反馈。',
+      err && err.message ? String(err.message) : ''
+    );
+    return;
+  }
   document.querySelectorAll('.nav-item, .tab').forEach((el) => {
     const active = el.dataset.view === ctx.view;
     el.classList.toggle('is-active', active);
@@ -1595,11 +1622,18 @@ document.addEventListener('click', (event) => {
   switch (act) {
     case 'nav': {
       const view = trigger.dataset.view;
-      if (!VIEWS[view] || view === ctx.view) return;
+      if (!VIEWS[view]) {
+        toast('页面未加载，请刷新后重试');
+        return;
+      }
+      if (view === ctx.view) return;
       ctx.view = view;
       render({ scrollTop: true });
       break;
     }
+    case 'reload-app':
+      window.location.reload();
+      break;
     case 'shift-date': {
       const scope = trigger.dataset.scope;
       if (!ctx.dates[scope]) return;
