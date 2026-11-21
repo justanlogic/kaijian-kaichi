@@ -92,10 +92,10 @@ Naming rules, deduplication, and sources are documented in [docs/food-data.md](d
 
 ## Roadmap
 
-- **v1.7.3 (released)**: check-for-updates now waits for the new service worker and reloads automatically; the settings page shows the version actually running
+- **v1.8.0 (released)**: daily nutrition assessment with a verdict and portion-level suggestions
+- **v1.7.3**: check-for-updates now waits for the new service worker and reloads automatically; the settings page shows the version actually running
 - **v1.7.2**: hover or tap a calorie bar on the overview / nutrition chart to see that day's protein, carbs and fat energy share
 - **v1.7.1**: demo mode, search-selection fix, docs
-- **v1.8.0**: daily nutrition assessment with a verdict and portion-level suggestions
 - **v1.9.0**: weekly report, CSV export, shareable summary card
 - **v1.10.0**: Strong / Hevy CSV import, per-account local cache isolation
 - **v2.0.0**: English UI, Hong Kong food pack, PWA Share Target
