@@ -50,7 +50,7 @@ function proteinOptions(gap, remainingKcal) {
  * 判定当天营养是否吃够。
  * 热量 90%–110% 且蛋白质 ≥90% 为「吃够了」；热量达标但蛋白 <80% 单列为「蛋白不足」。
  */
-export function assessDay(totals, goals) {
+export function assessDay(totals, goals, options = {}) {
   const intake = {
     kcal: Math.max(0, Number(totals.kcal) || 0),
     protein: Math.max(0, Number(totals.protein) || 0),
@@ -131,14 +131,16 @@ export function assessDay(totals, goals) {
     summary = `${kcalPart}，${proteinPart}${fatHigh ? '，脂肪偏高' : carbsHigh ? '，碳水偏高' : ''}。`;
   }
 
-  return { status, label, tone, ratios, gaps, excess, fatLow, fatHigh, carbsHigh, summary };
+  return { status, label, tone, ratios, gaps, excess, fatLow, fatHigh, carbsHigh, summary, trained: Boolean(options.trained) };
 }
 
 /** 最多两条建议：先补最缺的，再处理热量或脂肪的偏差 */
 export function buildTips(a) {
   if (a.status === 'empty') return [];
   if (a.status === 'over') return ['下一餐以瘦肉和蔬菜为主，少油少糖；不必跳餐。'];
-  if (a.status === 'enough') return ['今天已经吃够了，不用再刻意加餐；训练日注意补水。'];
+  if (a.status === 'enough') {
+    return [a.trained ? '今天已经吃够了，训练日注意补水即可。' : '今天已经吃够了，不用再刻意加餐。'];
+  }
 
   const tips = [];
   const remaining = a.gaps.kcal;

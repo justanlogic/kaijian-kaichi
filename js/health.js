@@ -57,6 +57,7 @@ export function buildHealthReport(state, today) {
   const workoutDays = days.filter((d) => d.workouts.length > 0);
   const nutritionDays7 = days.slice(-7).filter((d) => d.meals.length > 0).length;
   const sessions = workoutDays.length;
+  const hasTraining = sessions > 0;
 
   const kcalValues = nutritionDays.map((d) => d.totals.kcal);
   const avgKcal = nutritionDays.length ? Math.round(mean(kcalValues)) : 0;
@@ -130,8 +131,10 @@ export function buildHealthReport(state, today) {
   } else if (nutritionDays.length < 10) {
     missing.push('饮食记录 7–9 天，稳定性结论仅供参考');
   }
-  if (sessions < 4) {
-    missing.push(`训练记录还差 ${4 - sessions} 天（建议至少 4 天）`);
+  if (!hasTraining) {
+    missing.push('近 4 周没有训练记录；如需评估训练趋势，至少记录 4 天');
+  } else if (sessions < 4) {
+    missing.push(`训练记录 ${sessions} 天，趋势判断建议至少 4 天`);
   }
   if (nutritionDays7 === 0 && nutritionDays.length > 0) {
     missing.push('最近 7 天没有饮食记录，趋势可能已过时');
@@ -165,8 +168,8 @@ export function buildHealthReport(state, today) {
   }
 
   let freqStatus;
-  if (sessions < 4) {
-    freqStatus = statusOf('unknown', '数据不足', 'muted');
+  if (!hasTraining) {
+    freqStatus = statusOf('attention', '未训练', 'over');
   } else if (freq < targetSessions * 0.5) {
     freqStatus = statusOf('attention', '需关注', 'over');
   } else if (freq < targetSessions * 0.8) {
@@ -177,7 +180,9 @@ export function buildHealthReport(state, today) {
 
   let persistenceStatus;
   const trendForPersistence = volumeTrend ?? setsTrend;
-  if (sessions < 4) {
+  if (!hasTraining) {
+    persistenceStatus = statusOf('unknown', '无训练', 'muted');
+  } else if (sessions < 4) {
     persistenceStatus = statusOf('unknown', '数据不足', 'muted');
   } else if (activeWeeks <= 2 || (trendForPersistence != null && trendForPersistence <= -0.35) || (daysSinceLast ?? 0) > 14) {
     persistenceStatus = statusOf('attention', '需关注', 'over');
@@ -208,11 +213,11 @@ export function buildHealthReport(state, today) {
       key: 'stability',
       title: '摄入稳定性',
       ...stabilityStatus,
-      value: nutritionDays.length >= 2 ? `${pct(kcalCv)}%` : '—',
-      unit: '热量波动',
+      value: nutritionDays.length ? `${pct(adherence)}%` : '—',
+      unit: '热量达标',
       detail:
         nutritionDays.length >= 2
-          ? `热量达标 ${kcalHitDays}/${nutritionDays.length} 天 · 蛋白达标 ${proteinHitDays}/${nutritionDays.length} 天`
+          ? `热量波动 ${pct(kcalCv)}% · 蛋白达标 ${proteinHitDays}/${nutritionDays.length} 天`
           : '至少需要 2 天饮食记录',
       note: nutritionDays.length ? `日均 ${fmt(avgKcal)} kcal · 早餐 ${breakfastDays}/${nutritionDays.length} 天` : '',
     },
@@ -220,20 +225,20 @@ export function buildHealthReport(state, today) {
       key: 'frequency',
       title: '训练频率',
       ...freqStatus,
-      value: sessions ? freq.toFixed(1) : '—',
+      value: freq.toFixed(1),
       unit: '天/周',
       detail: `近 4 周 ${sessions} 天训练 · 目标 ${targetSessions} 天/周${targetIsDefault ? '（默认）' : ''}`,
-      note: sessions ? `最活跃一周 ${Math.max(...weeks.map((w) => w.sessions))} 天` : '',
+      note: sessions ? `最活跃一周 ${Math.max(...weeks.map((w) => w.sessions))} 天` : '最近一次训练：无记录',
     },
     {
       key: 'intensity',
       title: '训练强度',
       ...persistenceStatus,
-      value: trendForPersistence != null ? trendText(trendForPersistence) : sessions ? `${activeWeeks}/4` : '—',
-      unit: trendForPersistence != null ? (volumeTrend != null ? '容量变化' : '组数变化') : '周有训练',
-      detail: sessions
-        ? `${activeWeeks}/4 周有训练${daysSinceLast != null ? ` · 最近一次在 ${daysSinceLast === 0 ? '今天' : `${daysSinceLast} 天前`}` : ''}`
-        : '至少记录 4 天训练后才能判断趋势',
+      value: sessions >= 4 && trendForPersistence != null ? trendText(trendForPersistence) : hasTraining ? `${activeWeeks}/4` : '暂无',
+      unit: sessions >= 4 && trendForPersistence != null ? (volumeTrend != null ? '容量变化' : '组数变化') : hasTraining ? '周有训练' : '强度数据',
+      detail: !hasTraining
+        ? '近 4 周没有训练，容量与组数变化无法计算'
+        : `${activeWeeks}/4 周有训练${daysSinceLast != null ? ` · 最近一次在 ${daysSinceLast === 0 ? '今天' : `${daysSinceLast} 天前`}` : ''}`,
       note: totalVolume
         ? `近 4 周总容量 ${fmt(totalVolume)} kg`
         : totalSets
@@ -251,7 +256,9 @@ export function buildHealthReport(state, today) {
       'protein',
       'high',
       '蛋白质达标率偏低',
-      `近 4 周只有 ${proteinHitDays}/${nutritionDays.length} 天达到蛋白质目标的 90%，可能影响训练恢复与肌肉维持。`
+      `近 4 周只有 ${proteinHitDays}/${nutritionDays.length} 天达到蛋白质目标的 90%，${
+        hasTraining ? '可能影响训练恢复与肌肉维持。' : '在没有训练的情况下，也会影响肌肉维持、免疫与饱腹感。'
+      }`
     );
   }
   if (nutritionDays.length >= 7 && avgKcal < goal.kcal * 0.85) {
@@ -259,7 +266,9 @@ export function buildHealthReport(state, today) {
       'kcal-low',
       'high',
       '平均热量偏低',
-      `已记录日平均 ${fmt(avgKcal)} kcal，比目标低 ${pct(1 - avgKcal / goal.kcal)}%，长期可能影响精力与训练表现。`
+      `已记录日平均 ${fmt(avgKcal)} kcal，比目标低 ${pct(1 - avgKcal / goal.kcal)}%，${
+        hasTraining ? '长期可能影响精力与训练表现。' : '长期可能影响精力、基础代谢与肌肉维持。'
+      }`
     );
   }
   if (nutritionDays.length >= 7 && avgKcal > goal.kcal * 1.1) {
@@ -291,6 +300,22 @@ export function buildHealthReport(state, today) {
   }
   if (nutritionDays.length >= 7 && shares && shares.carbs > 0.65) {
     addRisk('carb-high', 'low', '碳水供能偏高', `碳水占总能量 ${pct(shares.carbs)}%，蛋白质空间被压缩。`);
+  }
+  if (!hasTraining && nutritionDays.length >= 7) {
+    addRisk(
+      'no-training',
+      'medium',
+      '近 4 周没有训练记录',
+      '这 28 天的训练记录为 0；如果是有意休息（恢复期、出差、伤病）可以忽略，否则建议先回到每周 2 次。'
+    );
+  }
+  if (hasTraining && sessions < 4 && freq < targetSessions * 0.6) {
+    addRisk(
+      'few-sessions',
+      'medium',
+      '训练次数很少',
+      `近 4 周只记录了 ${sessions} 天训练，平均每周 ${freq.toFixed(1)} 天；如果刚开始恢复可以忽略，否则频率还没稳定。`
+    );
   }
   if (sessions >= 4 && freq < targetSessions * 0.6) {
     addRisk(
@@ -339,13 +364,19 @@ export function buildHealthReport(state, today) {
   const tips = [];
   const addTip = (title, detail) => tips.push({ title, detail });
 
-  if (nutritionDays.length < 7 || sessions < 4) {
-    if (nutritionDays.length < 7) {
-      addTip('先补饮食记录', '连续记录 7 天，早/午/晚至少各一餐；有 10 天数据后，摄入稳定性的判断会更可靠。');
-    }
-    if (sessions < 4) {
-      addTip('先补训练记录', '近 4 周至少记录 4 天训练，才能看出频率和容量是在上升、持平还是下降。');
-    }
+  if (nutritionDays.length < 7) {
+    addTip('先补饮食记录', '连续记录 7 天，早/午/晚至少各一餐；有 10 天数据后，摄入稳定性的判断会更可靠。');
+  }
+  if (!hasTraining) {
+    addTip(
+      '先把训练频率定下来',
+      '每周 2 次、每次 30–40 分钟，先做 3 个复合动作（深蹲/推/拉）；连续 3 周后再加次数或重量。'
+    );
+  } else if (sessions < 4) {
+    addTip(
+      '把训练固定到每周 2 天',
+      `近 4 周只记录了 ${sessions} 天：如果确实在练，补记后趋势才准；如果没练，先固定周二、周六两次，每次 30 分钟。`
+    );
   }
 
   if (risks.some((r) => r.key === 'protein' || r.key === 'recovery')) {
@@ -355,7 +386,12 @@ export function buildHealthReport(state, today) {
     );
   }
   if (risks.some((r) => r.key === 'kcal-low')) {
-    addTip('每天加一份主食 + 蛋白', '米饭 150g + 鸡胸肉 100g，约 340 kcal、34g 蛋白；优先加在训练日。');
+    addTip(
+      '每天加一份主食 + 蛋白',
+      hasTraining
+        ? '米饭 150g + 鸡胸肉 100g，约 340 kcal、34g 蛋白；优先加在训练日。'
+        : '米饭 150g + 鸡胸肉 100g，约 340 kcal、34g 蛋白；分到三餐，或放在活动量最大的那一餐。'
+    );
   }
   if (risks.some((r) => r.key === 'unstable')) {
     addTip('先固定早餐和午餐', '晚餐按当天剩余额度调整；周末预留约 10% 的弹性，不用完全放开。');
@@ -421,8 +457,8 @@ export function buildHealthReport(state, today) {
           : `热量达标 ${kcalHitDays}/${nutritionDays.length} 天，蛋白质达标 ${proteinHitDays}/${nutritionDays.length} 天`;
 
   const trainingSentence =
-    sessions < 4
-      ? '训练记录还不足以判断频率与趋势'
+    !hasTraining
+      ? '这 4 周没有训练，训练频率与强度无法评估'
       : freq < targetSessions * 0.6
         ? `训练平均每周 ${freq.toFixed(1)} 天，低于 ${targetSessions} 天的目标`
         : trendForPersistence != null && trendForPersistence <= -0.3

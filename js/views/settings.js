@@ -6,7 +6,7 @@ import { icon } from '../icons.js';
 import { goalLabel } from '../recommend.js';
 
 /** 当前实际运行的前端版本；发版时与 sw.js 的缓存版本一起更新 */
-const APP_VERSION = 'v1.9.0';
+const APP_VERSION = 'v1.9.1';
 
 
 function formatSyncTime(iso) {

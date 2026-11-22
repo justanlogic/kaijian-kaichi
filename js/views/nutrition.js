@@ -1,7 +1,7 @@
 /* 营养页 */
 
 import { esc, fmt, fullDateLabel, lastNDates, weekdayShort, sum, clamp, shiftDate } from '../util.js';
-import { nutritionOn, macroShares } from '../selectors.js';
+import { nutritionOn, macroShares, workoutsOn } from '../selectors.js';
 import { assessDay, buildTips } from '../assessment.js';
 import { dateBar, viewHead, ring, macroBar, weekChart } from '../components.js';
 import { MEALS } from '../data.js';
@@ -29,7 +29,7 @@ export function render(state, ctx) {
   const today = ctx.today;
   const goals = state.settings.goals;
   const { meals, totals } = nutritionOn(state, date);
-  const assessment = assessDay(totals, goals);
+  const assessment = assessDay(totals, goals, { trained: workoutsOn(state, date).length > 0 });
   const tips = buildTips(assessment);
   const remaining = goals.kcal - totals.kcal;
   const over = remaining < 0;
