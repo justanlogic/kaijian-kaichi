@@ -79,8 +79,8 @@ function riskCard(report) {
         ? `<ul class="risk-list">
             ${report.risks
               .map(
-                (r) => `<li class="risk-item is-${r.severity}">
-                  <span class="risk-dot"></span>
+                (r, i) => `<li class="risk-item is-${r.severity}">
+                  <span class="risk-num">${i + 1}</span>
                   <div><b>${esc(r.title)}</b><p>${esc(r.detail)}</p></div>
                   <span class="risk-tag">${RISK_LABEL[r.severity]}</span>
                 </li>`

@@ -1253,10 +1253,21 @@ svg { display: block; }
 .risk-list { list-style: none; margin: 0; padding: 0; }
 .risk-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
 .risk-item:first-child { border-top: 0; padding-top: 0; }
-.risk-dot { width: 7px; height: 7px; margin-top: 6px; border-radius: 50%; flex: none; }
-.risk-item.is-high .risk-dot { background: var(--pink); }
-.risk-item.is-medium .risk-dot { background: var(--orange); }
-.risk-item.is-low .risk-dot { background: var(--text-3); }
+.risk-num {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.risk-item.is-high .risk-num { background: rgba(255, 138, 181, .12); color: var(--pink); }
+.risk-item.is-medium .risk-num { background: rgba(255, 157, 92, .12); color: var(--orange-text); }
 .risk-item > div { flex: 1; min-width: 0; }
 .risk-item b { font-size: 12px; font-weight: 600; }
 .risk-item p { margin-top: 2px; font-size: 11px; line-height: 1.55; color: var(--text-2); }
