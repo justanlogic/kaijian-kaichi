@@ -94,7 +94,7 @@ Naming rules, deduplication, and sources are documented in [docs/food-data.md](d
 
 ## Roadmap
 
-- **v1.9.2**: both lists on the assessment page now use numbered markers
+- **v1.9.2 (released)**: both lists on the assessment page now use numbered markers
 - **v1.9.1**: the health assessment now reflects actual training — zero workouts is treated as 0 days/week rather than "insufficient data", and risks no longer assume you train
 - **v1.9.0**: health assessment page and training analysis, both over the last 28 days of records
 - **v1.8.0**: daily nutrition assessment with a verdict and portion-level suggestions
